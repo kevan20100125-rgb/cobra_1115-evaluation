@@ -165,7 +165,7 @@ class TextVQAMapDataset(Dataset):
         qprompt_ocr = self.prompt_fn(ex["question"])
         qprompt_no_ocr = self.prompt_fn(ex["question"].split("\nReference OCR token:")[0])
 
-        if isinstance(self.image_processor, Compose) or hasattr(self.image_processor, "is_prismatic"):
+        if isinstance(self.image_processor, Compose) or hasattr(self.image_processor, "is_prismatic") or hasattr(self.image_processor, "is_cobra"):
             # This is a standard `torchvision.transforms` object or custom PrismaticVLM wrapper
             pixel_values = self.image_processor(Image.open(self.root_dir / ex["img_path"]).convert("RGB"))
 

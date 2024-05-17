@@ -155,7 +155,7 @@ class TallyQAMapDataset(Dataset):
         ex = self.examples[idx]
         question_prompt = self.prompt_fn(ex["question"], choices=[str(i) for i in range(16)])
 
-        if isinstance(self.image_processor, Compose) or hasattr(self.image_processor, "is_prismatic"):
+        if isinstance(self.image_processor, Compose) or hasattr(self.image_processor, "is_prismatic") or hasattr(self.image_processor, "is_cobra"):
             # This is a standard `torchvision.transforms` object or custom PrismaticVLM wrapper
             pixel_values = self.image_processor(Image.open(self.root_dir / ex["img_path"]).convert("RGB"))
         else:

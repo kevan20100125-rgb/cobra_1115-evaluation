@@ -195,7 +195,7 @@ class RefCOCOMapDataset(Dataset):
         ex = self.examples[idx]
         ref_expr_prompt = self.prompt_fn(ex["ref_expression"])
 
-        if isinstance(self.image_processor, Compose) or hasattr(self.image_processor, "is_prismatic"):
+        if isinstance(self.image_processor, Compose) or hasattr(self.image_processor, "is_prismatic") or hasattr(self.image_processor, "is_cobra"):
             # This is a standard `torchvision.transforms` object or custom PrismaticVLM wrapper
             pixel_values = self.image_processor(Image.open(self.root_dir / ex["img_path"]).convert("RGB"))
         else:

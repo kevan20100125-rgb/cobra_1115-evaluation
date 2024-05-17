@@ -38,9 +38,9 @@ class EvaluationConfig:
     )
 
     # === Model Parameters =>> Prismatic ===
-    model_family: str = "prismatic"                 # Model family to load from in < `prismatic` | `llava-v15` | ... >
+    model_family: str = "cobra"                 # Model family to load from in < `prismatic` | `llava-v15` | ... >
     model_id: Optional[str] = (                     # Model ID to load and run (instance of `model_family`)
-        "prism-clip+7b"
+        "cobra+3b"
     )
     model_dir: Optional[Path] = None                # Path to model checkpoint to load --> should be self-contained
 

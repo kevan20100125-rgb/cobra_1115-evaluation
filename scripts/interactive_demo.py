@@ -130,7 +130,7 @@ class ModelWorker:
             else:
                 question_prompt = [prompt_fn()]
 
-        if isinstance(self.vlm.image_processor, Compose) or hasattr(self.vlm.image_processor, "is_prismatic"):
+        if isinstance(self.vlm.image_processor, Compose) or hasattr(self.vlm.image_processor, "is_prismatic") or hasattr(self.vlm.image_processor, "is_cobra"):
             # This is a standard `torchvision.transforms` object or custom PrismaticVLM wrapper
             pixel_values = self.vlm.image_processor(images[0].convert("RGB"))
         else:

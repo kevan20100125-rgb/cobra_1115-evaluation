@@ -38,7 +38,7 @@ class ScoreConfig:
     )
 
     # === Model Parameters =>> Prismatic ===
-    model_id: str = "prism-clip+7b"                 # Model ID to load and run (instance of `model_family`)
+    model_id: str = "cobra+7b"                 # Model ID to load and run (instance of `model_family`)
 
     # === Model Parameters =>> Official LLaVa ===
     # model_id: str = "llava-v1.5-7b"
