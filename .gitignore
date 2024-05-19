@@ -153,3 +153,6 @@ cache/
 # Data
 datasets/
 download/
+
+# Results
+results/

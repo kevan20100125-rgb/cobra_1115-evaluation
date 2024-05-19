@@ -1,3 +1,6 @@
+# Evaluation Code for Cobra
+This is my fork of vlm-evaluation to provide the evaluation code of [Cobra](https://github.com/h-zhao1997/cobra). The content below mainly comes from the main branch.
+
 # VLM Evaluation
 ![](./images/03-evaluation-suite-med-res.png)
 
@@ -19,7 +22,7 @@ requires PyTorch >= 2.1.0, but has only been thoroughly tested with PyTorch 2.1.
 Once PyTorch has been properly installed, you can install this package locally via an editable installation:
 
 ```bash
-git clone https://github.com/TRI-ML/vlm-evaluation
+git clone https://github.com/h-zhao1997/vlm-evaluation
 cd vlm-evaluation
 pip install -e .
 ```
