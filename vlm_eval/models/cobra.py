@@ -77,7 +77,8 @@ class CobraVLM(VLM):
         bbox_refer_prompt_fn = self.get_bbox_refer_chat_prompt_fn()
         text_vqa_prompt_fn = self.get_vqa_chat_prompt_fn(uncertainty_aware=False)
         captioning_prompt_fn = self.get_captioning_prompt_fn()
-        tally_qa_prompt_fn = self.get_mc_prompt_fn(choices=[str(i) for i in range(16)])
+        tally_qa_prompt_fn = self.get_mc_prompt_fn()
+        ai2d_prompt_fn = self.get_mc_prompt_fn()
 
         return {
             "vqa-v2": vqa_prompt_fn,
@@ -89,6 +90,7 @@ class CobraVLM(VLM):
             "tally-qa": tally_qa_prompt_fn,
             "refcoco": bbox_refer_prompt_fn,
             "ocid-ref": bbox_refer_prompt_fn,
+            "ai2d": ai2d_prompt_fn,
             # Generic for GUI
             "captioning": captioning_prompt_fn,
             "bbox_pred": bbox_refer_prompt_fn,
@@ -117,8 +119,12 @@ class CobraVLM(VLM):
         prompt_builder_fn = self.model.get_prompt_builder
 
         def vqa_prompt_fn(question: str) -> str:
-            # Use Default Prompt (same as LLaVa-v1.5)
+            # Use Default Prompt (same as LLaVa-v1.5) except for text-vqa (move reference ocr token to the beginning of the prompt)
             prompt_builder = prompt_builder_fn()
+            q_maybe_ocr = question.split("\nReference OCR token: ")
+            if len(q_maybe_ocr) != 1:
+                q, ocr_tokens = q_maybe_ocr
+                question = f"Reference OCR token: {ocr_tokens}\n{q}"
             q_prompt = f"\n{question}"
 
             # For some evaluation such as VizWiz, models are expected to output "unanswerable" when questions are
@@ -130,7 +136,6 @@ class CobraVLM(VLM):
             # Otherwise, LLaVa-1.5 encourages short VQA responses by default.
             else:
                 q_prompt += "\nAnswer the question using a single word or phrase."
-
 
             # Add to Prompt Builder
             prompt_builder.add_turn(role="human", message=q_prompt)
@@ -172,15 +177,15 @@ class CobraVLM(VLM):
 
         return contrast_caption_prompt_fn
 
-    def get_mc_prompt_fn(self, choices: List[str]) -> Callable[[str], str]:
+    def get_mc_prompt_fn(self) -> Callable[[str], str]:
         """Generates the full reference prompt for a multiple choice question-answering task."""
         prompt_builder_fn = self.model.get_prompt_builder
 
-        # Create Choice String
-        assert len(choices) <= 26, "Too many answer choices vs. possible letters in the alphabet!"
-        choice_str = "\n".join([f"{chr(ord('A') + idx)}. {choice}" for idx, choice in enumerate(choices)])
+        def mc_prompt_fn(question: str, choices: List[str]) -> str:
+            # Create Choice String
+            assert len(choices) <= 26, "Too many answer choices vs. possible letters in the alphabet!"
+            choice_str = "\n".join([f"{chr(ord('A') + idx)}. {choice}" for idx, choice in enumerate(choices)])
 
-        def mc_prompt_fn(question: str) -> str:
             # Use Default Prompt (same as LLaVa-v1.5)
             prompt_builder = prompt_builder_fn()
             q_prompt = f"\n{question}\n{choice_str}"
@@ -219,16 +224,7 @@ class CobraVLM(VLM):
         pixel_values: torch.Tensor,
         question_prompts: List[str],
         return_string_probabilities: Optional[List[str]] = None,
-        initial_state: Optional[PartialState] = None
     ) -> Union[List[str], Tuple[List[str], List[List[float]]]]:
-        if "st" in self.model_id:
-            batch_size = len(question_prompts)
-            initial_state = self.model.initial_state['initial_state']
-            initial_state = initial_state.expand(batch_size, -1, -1, -1)
-            use_mamba_py = True
-        else:
-            initial_state = None
-            use_mamba_py = False
         return self.model.generate_batch(
             pixel_values, question_prompts, return_string_probabilities, **self.generate_kwargs
         )
