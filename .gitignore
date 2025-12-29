@@ -156,3 +156,20 @@ download/
 
 # Results
 results/
+
+# -------------------------
+# HPC / Slurm / runtime logs
+# -------------------------
+outputs/slurm/
+*.out
+*.err
+*.log
+
+# (可選) 其他常見產物
+outputs/**/wandb/
+outputs/**/runs/
+__pycache__/
+*.pt
+*.pth
+*.ckpt
+
