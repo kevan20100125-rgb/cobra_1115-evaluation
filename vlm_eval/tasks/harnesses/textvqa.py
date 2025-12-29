@@ -20,6 +20,7 @@ from PIL import Image
 from torch.utils.data import DataLoader, Dataset, DistributedSampler
 from torchvision.transforms import Compose
 from tqdm import tqdm
+import sys
 
 from vlm_eval.overwatch import initialize_overwatch
 from vlm_eval.tasks.registry import DATASET_REGISTRY
@@ -233,6 +234,7 @@ class TextVQATaskRunner:
                 dataloader,
                 desc="=>> Evaluating",
                 disable=not self.distributed_state.is_main_process,
+                file=sys.stdout,
             ):
                 if isinstance(pixel_values, torch.Tensor):
                     pixel_values = pixel_values.to(self.distributed_state.device)

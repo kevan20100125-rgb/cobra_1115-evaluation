@@ -41,7 +41,7 @@ class DatasetPreparationConfig:
     # Path Parameters
     root_dir: Path = Path(                                      # Path to root directory for storing datasets
         # "datasets/vlm-evaluation"
-        "/mnt/fsx/skaramcheti/datasets/vlm-evaluation"
+        "/work/asdf1234/vlm-evaluation"
     )
 
     # HF Hub Credentials (for LLaMa-2)
@@ -76,3 +76,4 @@ def prepare(cfg: DatasetPreparationConfig) -> None:
 
 if __name__ == "__main__":
     prepare()
+    print("Dataset Preparation Complete!")

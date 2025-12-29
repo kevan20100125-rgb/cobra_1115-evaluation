@@ -1,0 +1,80 @@
+vlm-evaluation/
+├── LICENSE
+├── README.md
+├── images
+│   └── 03-evaluation-suite-med-res.png
+├── pyproject.toml
+├── scripts
+│   ├── datasets
+│   │   └── prepare.py
+│   ├── evaluate.py
+│   ├── interactive_demo.py
+│   └── score.py
+├── tree_vlm-evaluation.txt
+├── vlm-evaluation_20251126.zip
+├── vlm_eval
+│   ├── __init__.py
+│   ├── conf
+│   │   ├── __init__.py
+│   │   └── datasets.py
+│   ├── models
+│   │   ├── __init__.py
+│   │   ├── cobra.py
+│   │   ├── instructblip.py
+│   │   ├── llava.py
+│   │   ├── prismatic.py
+│   │   └── quant_cobra.py
+│   ├── overwatch
+│   │   ├── __init__.py
+│   │   └── overwatch.py
+│   ├── serve
+│   │   ├── __init__.py
+│   │   ├── controller.py
+│   │   ├── examples
+│   │   │   ├── cows_in_pasture.png
+│   │   │   └── monkey_knives.png
+│   │   └── gradio_web_server.py
+│   ├── tasks
+│   │   ├── __init__.py
+│   │   ├── builders.py
+│   │   ├── download.py
+│   │   ├── harnesses
+│   │   │   ├── __init__.py
+│   │   │   ├── ai2d.py
+│   │   │   ├── gqa.py
+│   │   │   ├── ocidref.py
+│   │   │   ├── pope.py
+│   │   │   ├── refcoco.py
+│   │   │   ├── tallyqa.py
+│   │   │   ├── textvqa.py
+│   │   │   ├── vizwiz.py
+│   │   │   ├── vqav2.py
+│   │   │   └── vsr.py
+│   │   └── registry.py
+│   └── util
+│       ├── __init__.py
+│       ├── evaluation
+│       │   ├── __init__.py
+│       │   ├── gqa
+│       │   │   ├── __init__.py
+│       │   │   └── eval.py
+│       │   ├── nocaps
+│       │   │   └── metrics.py
+│       │   ├── textvqa
+│       │   │   ├── __init__.py
+│       │   │   └── m4c_evaluators.py
+│       │   ├── vizwiz
+│       │   │   ├── __init__.py
+│       │   │   └── eval.py
+│       │   └── vqav2
+│       │       ├── __init__.py
+│       │       └── eval.py
+│       ├── interfaces.py
+│       ├── loading
+│       │   ├── __init__.py
+│       │   └── refer.py
+│       └── preprocessing.py
+├── vlm_eval.sh
+└── vlm_prepare.sh
+
+20 directories, 58 files
