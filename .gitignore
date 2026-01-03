@@ -165,7 +165,7 @@ outputs/slurm/
 *.err
 *.log
 
-# (可選) 其他常見產物
+# 其他常見產物
 outputs/**/wandb/
 outputs/**/runs/
 __pycache__/

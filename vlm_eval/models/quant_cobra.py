@@ -106,13 +106,10 @@ def _validate_bits(bits: Optional[str]) -> Optional[str]:
         )
     return f"W{w_bits}A{a_bits}"
 
-def _resolve_pct_hi_lo_path(run_dir: Path, bits: str) -> Path:
+def _resolve_pct_hi_lo_path(run_dir: Path, bits: str) -> Optional[Path]:
     """
-    Resolve pct_hi_lo path robustly.
-
-    Priority:
-      1) outputs/quantize/pct_hi_lo_{bits}.pt  (new convention in vlm-eval)
-      2) outputs/quantize/pct_hi_lo.pt         (cobra default)
+    Stage 1: pct_hi_lo is optional (activation must remain float).
+    Later stages (act quant enabled) will re-enable strict requirement in cobra loader.
     """
     cand1 = run_dir / "outputs" / "quantize" / f"pct_hi_lo_{bits}.pt"
     if cand1.is_file():
@@ -122,11 +119,7 @@ def _resolve_pct_hi_lo_path(run_dir: Path, bits: str) -> Path:
     if cand2.is_file():
         return cand2
 
-    raise FileNotFoundError(
-        f"[QuantizedCobraVLM] Cannot find pct_hi_lo file. Tried:\n"
-        f"  - {str(cand1)}\n"
-        f"  - {str(cand2)}"
-    )
+    return None
 
 # -----------------------------------------------------------------------------
 # QuantizedCobraVLM
@@ -259,10 +252,12 @@ class QuantizedCobraVLM(CobraVLM):
         # 呼叫 cobra_1115 runtime loader（wrap + calibrate，fake quant）
         vlm = load_quantized_cobra_vlm(
             bits=bits,
-            pct_hi_lo_path=pct_hi_lo_path,
+            pct_hi_lo_path=pct_hi_lo_path,  # may be None in Stage 1
             hf_token=self.hf_token,
             base_dtype=self.dtype,
             device=self.distributed_state.device,
+            run_dir=run_dir,
+            output_dir=(run_dir / "outputs" / "quantize") if run_dir is not None else None,
         )
 
         tokenizer = vlm.llm_backbone.tokenizer
@@ -282,3 +277,4 @@ class QuantizedCobraVLM(CobraVLM):
             self.quant_backend,
             self.quant_mode,
         )
+
