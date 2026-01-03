@@ -38,41 +38,44 @@ export COBRA_MODEL_BASE_ID="${COBRA_MODEL_BASE_ID:-cobra+3b}"
 
 # BITS：控制 W_bits / A_bits，會灌進 MODEL_ID
 # 例：BITS=W8A8 → "cobra+3b-ptq-w8a8-fake"
-export BITS="${BITS:-W8A8}"
+export BITS="${BITS:-W4A4}"
 
 # BACKEND：
 #   float = 不量化，直接用 CobraVLM（MODEL_ID=cobra+3b）
 #   fake  = fake-quant backend（low-bit semantics simulated in float）
 export BACKEND="${BACKEND:-fake}"
 
+# ==============================
+# PTQ_STAGE: 1 => Stage 1 W-only baseline
+# ==============================
+export PTQ_STAGE="${PTQ_STAGE:-1}"
+
 # -----------------------------
 # Preflight checks (fail-fast)
+# Stage 1: pct_hi_lo is NOT required
 # -----------------------------
 if [[ "${BACKEND}" == "fake" ]]; then
-  PCT_HI_LO_PATH="${COBRA_1115_ROOT}/outputs/quantize/pct_hi_lo_${BITS}.pt"
-  if [[ ! -f "${PCT_HI_LO_PATH}" ]]; then
-    echo "[ERROR] Missing pct_hi_lo file for BITS=${BITS}: ${PCT_HI_LO_PATH}"
-    echo "Run cobra_1115_ptq.sh first with the same BITS, e.g.:"
-    echo "BITS=${BITS} SMOKE=0 MODE=calibrate ./cobra_1115_ptq.sh"
-    exit 2
+  if [[ "${PTQ_STAGE}" != "1" ]]; then
+    PCT_HI_LO_PATH="${COBRA_1115_ROOT}/outputs/quantize/pct_hi_lo_${BITS}.pt"
+    if [[ ! -f "${PCT_HI_LO_PATH}" ]]; then
+      echo "[ERROR] Missing pct_hi_lo file for BITS=${BITS}: ${PCT_HI_LO_PATH}"
+      echo "Run cobra_1115_ptq.sh first with the same BITS, e.g.:"
+      echo "BITS=${BITS} SMOKE=0 MODE=calibrate ./cobra_1115_ptq.sh"
+      exit 2
+    fi
+  else
+    echo "[Stage 1] Skip pct_hi_lo preflight check (activation remains float)."
   fi
 fi
-# ==============================
-# ROTATION_MODE：控制 LLM output projector 的旋轉模式
-#   hk       -> KLT + Hadamard
-#   hadamard -> 只有 Hadamard
-#   none     -> 完全不旋轉
-export ROTATION_MODE="${ROTATION_MODE:-hk}"
 
-case "${ROTATION_MODE}" in
-  hk|hadamard|none)
-    ;;
-  *)
-    echo "[WARN] Unknown ROTATION_MODE='${ROTATION_MODE}', falling back to 'hk'." >&2
-    ROTATION_MODE="hk"
-    export ROTATION_MODE
-    ;;
-esac
+# ==============================
+# ROTATION_MODE: Stage 1 forces none
+# ==============================
+if [[ "${PTQ_STAGE}" == "1" ]]; then
+  export ROTATION_MODE="none"
+else
+  export ROTATION_MODE="${ROTATION_MODE:-hk}"
+fi
 
 # 統一給 cobra_1115 runtime 使用的 env key
 export COBRA_PROJECTOR_ROTATION_MODE="${ROTATION_MODE}"
@@ -107,7 +110,7 @@ mkdir -p results
 #   evaluate = 只跑 scripts/evaluate.py
 #   score    = 只跑 scripts/score.py
 #   full     = 依序 prepare + evaluate + score
-MODE="${MODE:-evaluate}"
+MODE="${MODE:-score}"
 
 DATA_ROOT="${DATA_ROOT:-/work/asdf1234/datasets}"
 # Dataset family（給 scripts/datasets/prepare.py 用）
